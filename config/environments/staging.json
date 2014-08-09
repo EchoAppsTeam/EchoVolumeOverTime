@@ -1,0 +1,18 @@
+{
+	"version": 1,
+	"manifest": {
+		"id": "echo-volume-over-time-staging",
+		"name": "Historical Volume (Staging)"
+	},
+	"appBaseURLs": {
+		"dev": "//echoplatform.com/sandbox/staging/apps/echo/volume-over-time/v{%=packageVersions.stable%}/dev",
+		"prod": "//echoplatform.com/sandbox/staging/apps/echo/volume-over-time/v{%=packageVersions.stable%}"
+	},
+	"apiBaseURLs": {
+		"StreamServer": {
+			"basic": "//api.dss.ul.js-kit.com/v1/",
+			"ws": "//live.dss.ul.js-kit.com/v1/"
+		},
+		"DataServer": "http://ds0.ul.js-kit.com/api/"
+	}
+}

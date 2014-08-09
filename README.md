@@ -2,7 +2,7 @@
 
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
-Echo Volume Over Time app provides an ability to display graphs and trends on historical data and watch trends and graphs updates in real time.
+Echo Historical Volume app provides an ability to display graphs and trends on historical data and watch them changing in real time.
 
 
 # Installation instructions
@@ -22,11 +22,3 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-
-# Demo
-
-You can see the demo page of Echo Social Mapp app [here](http://echoappsteam.github.io/EchoSocialMap/).
-
-And here is the screenshot:
-
-![Echo Social Map](http://static.squarespace.com/static/52c5b81de4b0494603ede7e5/t/52f3d840e4b0bdba1c1766b5/1391712332640/conversations-overview.png?format=650w "Echo Social Map Screenshot")

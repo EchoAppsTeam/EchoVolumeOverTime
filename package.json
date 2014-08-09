@@ -1,0 +1,39 @@
+{
+  "name": "echo-volume-over-time",
+  "description": "Echo Historical Volume app",
+  "version": "1.0.0",
+  "author": {
+    "name": "Echo",
+    "url": "http://aboutecho.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/EchoAppsTeam/EchoVolumeOverTime.git"
+  },
+  "bugs": {
+    "url": "https://github.com/EchoAppsTeam/EchoVolumeOverTime/issues"
+  },
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "engines": {
+    "node": ">=0.10"
+  },
+  "dependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-concat": "^0.4.0",
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-uglify": "^0.5.0",
+    "lodash": "^2.4.1",
+    "sphere": "^0.2.2"
+  },
+  "devDependencies": {
+    "grunt-contrib-watch": "^0.6.1"
+  },
+  "private": true
+}

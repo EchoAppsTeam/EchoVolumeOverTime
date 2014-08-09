@@ -1,0 +1,18 @@
+{
+	"version": 1,
+	"manifest": {
+		"id": "echo-volume-over-time",
+		"name": "Historical Volume"
+	},
+	"appBaseURLs": {
+		"dev": "//cdn.echoenabled.com/apps/echo/volume-over-time/v{%=packageVersions.stable%}/dev",
+		"prod": "//cdn.echoenabled.com/apps/echo/volume-over-time/v{%=packageVersions.stable%}"
+	},
+	"apiBaseURLs": {
+		"StreamServer": {
+			"basic": "//api.echoenabled.com/v1/",
+			"ws": "//live.echoenabled.com/v1/"
+		},
+		"DataServer": "https://api.dataserver.echoenabled.com/v1/"
+	}
+}
