@@ -34,19 +34,20 @@ volume.config = {
 	"presentation": {
 		"visualization": "bar", // or "line"
 		"maxIntervals": 10,
-		"maxWidth": 700  // in px
-	},
-	"barChart": {
-		"barStrokeWidth": 1,
-		"barValueSpacing": 10,
+		"maxWidth": 700,  // in px
 		"fillColor": "#D8D8D8",
 		"strokeColor": "#C0C0C0",
 		"highlightFill": "#C0C0C0",
 		"highlightStroke": "#C0C0C0"
 	},
-	"lineChart": {
-		"fillColor": "#D8D8D8",
-		"strokeColor": "#C0C0C0"
+	"chart": {
+		"tooltipTemplate": "<%=value%>",
+		"scaleShowGridLines": false,
+		"scaleLineColor": "inherit",
+		"scaleLabel": " ", // keep " ", not ""!
+		"responsive": true,
+		"scaleFontSize": 10,
+		"barStrokeWidth": 1
 	},
 	"dependencies": {
 		"StreamServer": {
@@ -137,17 +138,7 @@ volume.renderers.container = function(element) {
 };
 
 volume.methods._initChart = function(target) {
-	var visualization = this.config.get("presentation.visualization");
-
-	var options = $.extend({
-		"tooltipTemplate": "<%=value%>",
-		"scaleShowGridLines": false,
-		"scaleLineColor": "inherit",
-		"scaleLabel": " ", // keep " ", not ""!
-		"responsive": true,
-		"scaleFontSize": 10
-	}, this.config.get(visualization + "Chart"));
-
+	var presentation = this.config.get("presentation");
 	var periods = Echo.Utils.foldl(
 		{"labels": [], "data": []},
 		this.get("periods"),
@@ -160,15 +151,15 @@ volume.methods._initChart = function(target) {
 		"labels": periods.labels,
 		"datasets": [{
 			"data": periods.data,
-			"fillColor": options.fillColor,
-			"strokeColor": options.strokeColor,
-			"highlightFill": options.highlightFill,
-			"highlightStroke": options.highlightStroke
+			"fillColor": presentation.fillColor,
+			"strokeColor": presentation.strokeColor,
+			"highlightFill": presentation.highlightFill,
+			"highlightStroke": presentation.highlightStroke
 		}]
 	};
 	var ctx = target.get(0).getContext("2d");
-	var type = visualization === "bar" ? "Bar" : "Line";
-	return new Chart(ctx)[type](data, options);
+	var type = presentation.visualization === "bar" ? "Bar" : "Line";
+	return new Chart(ctx)[type](data, this.config.get("chart"));
 };
 
 volume.methods._normalizeEntries = function(entries) {

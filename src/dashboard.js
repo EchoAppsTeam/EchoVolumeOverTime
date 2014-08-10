@@ -64,8 +64,8 @@ dashboard.config.ecl = [{
 		"type": "string",
 		"default": "bar",
 		"config": {
-			"title": "Visualization",
-			"desc": "Specifies the graph type to be displayed",
+			"title": "Chart style",
+			"desc": "Specifies the chart type to be used",
 			"options": [{
 				"title": "Bar Chart",
 				"value": "bar"
@@ -80,8 +80,8 @@ dashboard.config.ecl = [{
 		"type": "number",
 		"default": 10,
 		"config": {
-			"title": "Maximum intervals",
-			"desc": "Specifies a maximum amount of itervals displayed on the graph"
+			"title": "Maximum slices",
+			"desc": "Specifies a maximum number of time slices for the chart"
 		}
 	}, {
 	"component": "Input",
@@ -93,75 +93,41 @@ dashboard.config.ecl = [{
 			"desc": "Specifies a maximum width (in pixels) of an App container",
 			"data": {"sample": 700}
 		}
-	}]
-}, {
-	"component": "Group",
-	"name": "barChart",
-	"type": "object",
-	"config": {
-		"title": "Bar Chart config"
-	},
-	"items": [{
+	}, {
 		"component": "Input",
 		"name": "fillColor",
 		"type": "string",
-		"default": "#D8D8D8",
 		"config": {
 			"title": "Fill color",
-			"desc": "Specifies bar chart items fill color"
+			"desc": "Specifies the primary fill color of the chart",
+			"data": {"sample": "#D8D8D8"}
 		}
 	}, {
 		"component": "Input",
 		"name": "strokeColor",
 		"type": "string",
-		"default": "#C0C0C0",
 		"config": {
 			"title": "Stroke color",
-			"desc": "Specifies bar chart items stroke color"
+			"desc": "Specifies border color/line color of the chart",
+			"data": {"sample": "#C0C0C0"}
 		}
 	}, {
 		"component": "Input",
 		"name": "highlightFill",
 		"type": "string",
-		"default": "#C0C0C0",
 		"config": {
 			"title": "Hover fill color",
-			"desc": "Specifies bar chart items fill color when mouse is over the area"
+			"desc": "Specifies primary fill color of the chart when mouse is hovering over it (for Bar Chart only)",
+			"data": {"sample": "#C0C0C0"}
 		}
 	}, {
 		"component": "Input",
 		"name": "highlightStroke",
 		"type": "string",
-		"default": "#C0C0C0",
 		"config": {
 			"title": "Hover stroke color",
-			"desc": "Specifies bar chart items stroke color when mouse is over the area"
-		}
-	}]
-}, {
-	"component": "Group",
-	"name": "lineChart",
-	"type": "object",
-	"config": {
-		"title": "Line Chart config"
-	},
-	"items": [{
-		"component": "Input",
-		"name": "fillColor",
-		"type": "string",
-		"default": "#D8D8D8",
-		"config": {
-			"title": "Fill color",
-			"desc": "Specifies line chart area fill color"
-		}
-	}, {
-		"component": "Input",
-		"name": "strokeColor",
-		"type": "string",
-		"default": "#C0C0C0",
-		"config": {
-			"title": "Stroke color",
-			"desc": "Specifies line chart stroke color"
+			"desc": "Specifies stroke color of the chart when mouse is hovering over it (for Bar Chart only)",
+			"data": {"sample": "#C0C0C0"}
 		}
 	}]
 }, {
