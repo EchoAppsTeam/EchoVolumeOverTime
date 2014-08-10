@@ -46,7 +46,6 @@ volume.config = {
 		"scaleLineColor": "inherit",
 		"scaleLabel": " ", // keep " ", not ""!
 		"responsive": true,
-		"scaleFontSize": 10,
 		"barStrokeWidth": 1
 	},
 	"dependencies": {
@@ -221,6 +220,11 @@ volume.methods._getTimestampTranslation = function(timestamp) {
 	}
 };
 
+volume.methods._getTS = function(y, m, d, h, min) {
+	var date = y ? new Date(y, m || 0, d || 1, h || 0, min || 0, 0, 0) : new Date();
+	return Math.round(date.getTime() / 1000);
+};
+
 volume.methods._getPeriodResolutionType = function(entries) {
 	var maxIntervals = this.config.get("presentation.maxIntervals");
 	var date = new Date(),
@@ -230,49 +234,44 @@ volume.methods._getPeriodResolutionType = function(entries) {
 		hours = date.getHours(),
 		mins = date.getMinutes();
 
-	var avg = entries.length > 1
-		? (entries[0].timestamp - entries[entries.length - 1].timestamp) / entries.length
+	var avg = entries.length
+		? (this._getTS() - entries[entries.length - 1].timestamp) / 2
 		: 0;
-
-	var getTS = function(y, m, d, h, min) {
-		var date = new Date(y, m || 0, d || 1, h || 0, min || 0, 0, 0);
-		return Math.round(date.getTime() / 1000);
-	};
 
 	if (avg < 60 * 60) {
 		return {
 			"type": "min",
 			"limit": maxIntervals,
 			"interval": 60,
-			"start": getTS(year, month, day, hours, mins)
+			"start": this._getTS(year, month, day, hours, mins)
 		};
 	} else if (avg < 60 * 60 * 24) {
 		return {
 			"type": "hour",
 			"limit": maxIntervals,
 			"interval": 60 * 60,
-			"start": getTS(year, month, day, hours)
+			"start": this._getTS(year, month, day, hours)
 		};
 	} else if (avg < 60 * 60 * 24 * 7) {
 		return {
 			"type": "day",
 			"limit": maxIntervals,
 			"interval": 60 * 60 * 24,
-			"start": getTS(year, month, day)
+			"start": this._getTS(year, month, day)
 		};
 	} else if (avg <  60 * 60 * 24 * 365) {
 		return {
 			"type": "month",
 			"limit": maxIntervals,
 			"interval":  60 * 60 * 24 * 30,
-			"start": getTS(year, month)
+			"start": this._getTS(year, month)
 		};
 	}
 	return {
 		"type": "year",
 		"limit": 3, // show 3 last years, no need to display more
 		"interval": 60 * 60 * 24 * 365,
-		"start": getTS(year)
+		"start": this._getTS(year)
 	};
 };
 
