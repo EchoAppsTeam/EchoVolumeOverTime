@@ -96,7 +96,7 @@ volume.init = function() {
 			app.render();
 
 			// we init graph *only* after a target is placed into DOM,
-			// Chart.js doesn't like elements detached frim DOM structure...
+			// Chart.js doesn't like elements detached from DOM structure...
 			app.set("chart", app._initChart(app.view.get("graph")));
 
 			app.ready();
