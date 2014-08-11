@@ -245,21 +245,24 @@ volume.methods._getPeriodResolutionType = function(entries) {
 			"interval": 60,
 			"start": this._getTS(year, month, day, hours, mins)
 		};
-	} else if (avg < 60 * 60 * 24) {
+	}
+	if (avg < 60 * 60 * 24) {
 		return {
 			"type": "hour",
 			"limit": maxIntervals,
 			"interval": 60 * 60,
 			"start": this._getTS(year, month, day, hours)
 		};
-	} else if (avg < 60 * 60 * 24 * 7) {
+	}
+	if (avg < 60 * 60 * 24 * 7) {
 		return {
 			"type": "day",
 			"limit": maxIntervals,
 			"interval": 60 * 60 * 24,
 			"start": this._getTS(year, month, day)
 		};
-	} else if (avg < 60 * 60 * 24 * 365) {
+	}
+	if (avg < 60 * 60 * 24 * 365) {
 		return {
 			"type": "month",
 			"limit": maxIntervals,
