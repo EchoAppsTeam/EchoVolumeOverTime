@@ -28,13 +28,13 @@ volume.vars = {
 
 volume.config = {
 	"targetURL": undefined,
-        // amount of items to retrieve from StreamServer
-        // 100 is the limitation on the amount of root items
+	// amount of items to retrieve from StreamServer
+	// 100 is the limitation on the amount of root items
 	"maxItemsToRetrieve": 100,
 	"presentation": {
 		"visualization": "bar", // or "line"
 		"maxIntervals": 10,
-		"maxWidth": 700,  // in px
+		"maxWidth": 700, // in px
 		"fillColor": "#D8D8D8",
 		"strokeColor": "#C0C0C0",
 		"highlightFill": "#C0C0C0",
@@ -127,9 +127,9 @@ volume.destroy = function() {
 };
 
 volume.templates.main =
-        '<div class="{class:container}">' +
+	'<div class="{class:container}">' +
 		'<canvas class="{class:graph}"></canvas>' +
-        '</div>';
+	'</div>';
 
 volume.renderers.container = function(element) {
 	element.css({"max-width": parseInt(this.config.get("presentation.maxWidth") + "px")});
@@ -259,11 +259,11 @@ volume.methods._getPeriodResolutionType = function(entries) {
 			"interval": 60 * 60 * 24,
 			"start": this._getTS(year, month, day)
 		};
-	} else if (avg <  60 * 60 * 24 * 365) {
+	} else if (avg < 60 * 60 * 24 * 365) {
 		return {
 			"type": "month",
 			"limit": maxIntervals,
-			"interval":  60 * 60 * 24 * 30,
+			"interval": 60 * 60 * 24 * 30,
 			"start": this._getTS(year, month)
 		};
 	}
@@ -326,9 +326,9 @@ volume.methods._isWithinPeriod = function(entry, period) {
 };
 
 volume.methods._assembleQuery = function() {
-        var query = "scope:{config:targetURL} " +
-                "itemsPerPage:{config:maxItemsToRetrieve} children:0";
-        return this.substitute({"template": query});
+	var query = "scope:{config:targetURL} " +
+		"itemsPerPage:{config:maxItemsToRetrieve} children:0";
+	return this.substitute({"template": query});
 };
 
 volume.methods._requestData = function(handlers) {
@@ -352,8 +352,8 @@ volume.methods._requestData = function(handlers) {
 };
 
 volume.css =
-        '.{class:container} { margin: 0px auto; }' +
-        '.{class:graph} { width: 100%; }';
+	'.{class:container} { margin: 0px auto; }' +
+	'.{class:graph} { width: 100%; }';
 
 Echo.App.create(volume);
 
