@@ -27,7 +27,7 @@
 		"type": "external",
 		"title": "Documentation",
 		"config": {
-			"src": "http://emb.echoplatform.com/volume-over-time/docs/overview/"
+			"src": "http://emb.echoplatform.com/historical-volume/docs/overview/"
 		}
 	}],
 	"client_widget": {
