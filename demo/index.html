@@ -7,23 +7,20 @@
 <body>
 
 <center><h1>Bar chart (#puppies)</h1></center>
-<div class="echo-canvas" data-canvas-provider="fastly" data-canvas-id="echo-apps-andrew/6jk9wrxzn2#1"></div>
+<div class="echo-canvas" data-canvas-provider="fastly" data-canvas-id="echo/4p8q62gcm1#1"></div>
 
 <br>
 
 <center><h1>Line chart (#puppies)</h1></center>
-<div class="echo-canvas" data-canvas-provider="fastly" data-canvas-id="echo-apps-andrew/6jk9wrxzn2#2"></div>
+<div class="echo-canvas" data-canvas-provider="fastly" data-canvas-id="echo/4p8q62gcm1#2"></div>
 
 <script>
-	// TODO: replace dev instances with demo ones during the first release!
-	Echo.Loader.override("echo-apps-andrew/6jk9wrxzn2#1", "abm4473jt0", {
-		"targetURL": "http://social-chatter.echoplatform.com/social-source-input/fm703jjma7",
-		"dependencies": {"StreamServer": {"appkey": "echo.echo.visitors-statistics.echo.prod"}}
+	Echo.Loader.override("echo/4p8q62gcm1#1", "ms4jt8ykr1", {
+		"targetURL": "http://social-chatter.echoplatform.com/social-source-input/fm703jjma7"
 	});
-	Echo.Loader.override("echo-apps-andrew/6jk9wrxzn2#2", "abm4473jt0", {
+	Echo.Loader.override("echo/4p8q62gcm1#2", "ms4jt8ykr1", {
 		"targetURL": "http://social-chatter.echoplatform.com/social-source-input/fm703jjma7",
-		"presentation": {"visualization": "line"},
-		"dependencies": {"StreamServer": {"appkey": "echo.echo.visitors-statistics.echo.prod"}}
+		"presentation": {"visualization": "line"}
 	});
 </script>
 
