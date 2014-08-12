@@ -37,18 +37,10 @@ dashboard.config.ecl = [{
 	"config": {
 		"title": "",
 		"labels": {
-			"dataserverBundleName": "Echo Social Map Auto-Generated Bundle for {instanceName}"
+			"dataserverBundleName": "Echo Historical Volume Auto-Generated Bundle for {instanceName}"
 		},
 		"apiBaseURLs": {
 			"DataServer": "{%= apiBaseURLs.DataServer %}"
-		},
-		"bundle": {
-			"input": {
-				"data": {"rules": [
-					'include | geo',
-					'streamserver.add-markers:"geo.location:${geo.longitude};${geo.latitude},geo.marker" | geo'
-				]}
-			}
 		}
 	}
 }, {
