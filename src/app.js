@@ -46,7 +46,8 @@ volume.config = {
 		"scaleLineColor": "inherit",
 		"scaleLabel": " ", // keep " ", not ""!
 		"responsive": true,
-		"barStrokeWidth": 1
+		"barStrokeWidth": 1,
+		"scaleBeginAtZero": true
 	},
 	"dependencies": {
 		"StreamServer": {
@@ -162,9 +163,11 @@ volume.methods._initChart = function(target) {
 };
 
 volume.methods._normalizeEntries = function(entries) {
-	return $.map(entries, function(entry) {
-		entry.timestamp = Echo.Utils.timestampFromW3CDTF(entry.object.published);
-		return entry;
+	return Echo.Utils.foldl([], entries, function(entry, acc) {
+		if (entry.verbs[0] === "http://activitystrea.ms/schema/1.0/post") {
+			entry.timestamp = Echo.Utils.timestampFromW3CDTF(entry.object.published);
+			acc.push(entry);
+		}
 	});
 };
 
@@ -199,11 +202,15 @@ volume.methods._placeIntoPeriods = function(entries, updateChart) {
 };
 
 volume.methods._getTimestampTranslation = function(timestamp) {
+	var app = this;
 	var date = new Date(timestamp * 1000);
 	// convert to 12-hour time format
 	var getHour = function() {
 		var hour = date.getHours() % 12;
 		return hour === 0 ? 12 : hour;
+	};
+	var getLabelForMonth = function(n) {
+		return app.labels.get(app.get("months")[n]);
 	};
 	switch (this.get("period.type")) {
 		case "min":
@@ -212,9 +219,9 @@ volume.methods._getTimestampTranslation = function(timestamp) {
 		case "hour":
 			return getHour() + ":00";
 		case "day":
-			return this.get("months")[date.getMonth()] + " " + (date.getDate());
+			return getLabelForMonth(date.getMonth()) + " " + (date.getDate());
 		case "month":
-			return this.get("months")[date.getMonth()];
+			return getLabelForMonth(date.getMonth());
 		case "year":
 			return date.getFullYear();
 	}
@@ -329,7 +336,7 @@ volume.methods._isWithinPeriod = function(entry, period) {
 };
 
 volume.methods._assembleQuery = function() {
-	var query = "scope:{config:targetURL} " +
+	var query = "scope:{config:targetURL} sortOrder:reverseChronological " +
 		"itemsPerPage:{config:maxItemsToRetrieve} children:0";
 	return this.substitute({"template": query});
 };
