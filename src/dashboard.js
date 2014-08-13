@@ -265,11 +265,11 @@ dashboard.methods._displayError = function(message) {
 };
 
 dashboard.methods._assembleTargetURL = function() {
-	var re =  new RegExp("\/" + this.get("data.instance.name") + "$");
+	var re = new RegExp("\/" + this.get("data.instance.name") + "$");
 	var targetURL = this.get("data.instance.config.targetURL");
 
 	if (!targetURL || !targetURL.match(re)) {
-		targetURL =  "http://" + this.get("domains")[0] + "/social-source-input/" + this.get("data.instance.name");
+		targetURL = "http://" + this.get("domains")[0] + "/social-source-input/" + this.get("data.instance.name");
 	}
 
 	return targetURL;
