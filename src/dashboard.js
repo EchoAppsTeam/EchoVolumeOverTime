@@ -40,7 +40,7 @@ dashboard.config.ecl = [{
 			"dataserverBundleName": "Echo Historical Volume Auto-Generated Bundle for {instanceName}"
 		},
 		"apiBaseURLs": {
-			"DataServer": "{%= apiBaseURLs.DataServer %}"
+			"DataServer": "{%= apiBaseURLs.DataServer %}/"
 		}
 	}
 }, {
@@ -194,10 +194,13 @@ dashboard.methods._prepareECL = function(items) {
 
 	var instructions = {
 		"targetURL": function(item) {
-			item.config = $.extend({
-				"instanceName": self.get("data.instance.name"),
+			item.config = $.extend(true, {
+				"bundle": {
+					"url": self.get("data.instance.provisioningDetails.bundleURL")
+				},
 				"domains": self.get("domains"),
 				"apiToken": self.config.get("dataserverToken"),
+				"instanceName": self.get("data.instance.name"),
 				"valueHandler": function() {
 					return self._assembleTargetURL();
 				}
@@ -265,14 +268,8 @@ dashboard.methods._displayError = function(message) {
 };
 
 dashboard.methods._assembleTargetURL = function() {
-	var re = new RegExp("\/" + this.get("data.instance.name") + "$");
-	var targetURL = this.get("data.instance.config.targetURL");
-
-	if (!targetURL || !targetURL.match(re)) {
-		targetURL = "http://" + this.get("domains")[0] + "/social-source-input/" + this.get("data.instance.name");
-	}
-
-	return targetURL;
+	return this.get("data.instance.config.targetURL")
+		|| this.get("data.instance.provisioningDetails.targetURL");
 };
 
 Echo.AppServer.Dashboard.create(dashboard);
