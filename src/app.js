@@ -89,11 +89,7 @@ volume.init = function() {
 		app.set("watchers.visibility", watcher);
 	}
 
-	app.request = app._getRequestObject({
-		"onData": app._getHandlerFor("onData"),
-		"onUpdate": app._getHandlerFor("onUpdate"),
-		"onError": app._getHandlerFor("onError")
-	});
+	app.request = app._getRequestObject();
 
 	var data = app.get("data");
 	if ($.isEmptyObject(data)) {
@@ -311,10 +307,8 @@ volume.methods._assembleQuery = function() {
 	return this.substitute({"template": query});
 };
 
-volume.methods._getRequestObject = function(handlers) {
+volume.methods._getRequestObject = function() {
 	var ssConfig = this.config.get("dependencies.StreamServer");
-	// keep a reference to a request object in "this" to trigger its
-	// automatic sweeping out on Echo.Control level at app destory time
 	return Echo.StreamServer.API.request({
 		"endpoint": "search",
 		"apiBaseURL": ssConfig.apiBaseURL,
@@ -323,10 +317,10 @@ volume.methods._getRequestObject = function(handlers) {
 			"appkey": ssConfig.appkey
 		},
 		"liveUpdates": $.extend(ssConfig.liveUpdates, {
-			"onData": handlers.onUpdate
+			"onData": this._getHandlerFor("onUpdate")
 		}),
-		"onError": handlers.onError,
-		"onData": handlers.onData
+		"onError": this._getHandlerFor("onError"),
+		"onData": this._getHandlerFor("onData")
 	});
 };
 
