@@ -6,23 +6,14 @@ var volume = Echo.App.manifest("Echo.Apps.VolumeOverTime");
 if (Echo.App.isDefined(volume)) return;
 
 volume.vars = {
-	"timer": undefined,
 	"chart": undefined,
 	"period": undefined,
 	"periods": [],
+	"visible": true,
+	"watchers": {},
 	"months": [
-		"Jan",
-		"Feb",
-		"Mar",
-		"Apr",
-		"May",
-		"Jun",
-		"Jul",
-		"Aug",
-		"Sep",
-		"Oct",
-		"Nov",
-		"Dec"
+		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 	]
 };
 
@@ -85,46 +76,45 @@ volume.init = function() {
 		return;
 	}
 
-	app._requestData({
-		"onData": function(data) {
-			var entries = app._normalizeEntries(data.entries);
-			app.set("period", app._getPeriodResolutionType(entries));
+	// spin up document visibility watcher to stop
+	// chart rendering in case a page is not active
+	var watcher = app._createDocumentVisibilityWatcher();
+	if (watcher) {
+		watcher.start(function() {
+			app.set("visible", true);
+			app.refresh();
+		}, function() {
+			app.set("visible", false);
+		});
+		app.set("watchers.visibility", watcher);
+	}
 
-			app._createPeriods();
-			app._setupPeriodsWatcher();
-			app._placeIntoPeriods(entries);
-
-			app.render();
-
-			// we init graph *only* after a target is placed into DOM,
-			// Chart.js doesn't like elements detached from DOM structure...
-			app.set("chart", app._initChart(app.view.get("graph")));
-
-			app.ready();
-		},
-		"onUpdate": function(data) {
-			app._placeIntoPeriods(app._normalizeEntries(data.entries), true);
-		},
-		"onError": function(data, options) {
-			var isCriticalError =
-				typeof options.critical === "undefined" ||
-				options.critical && options.requestType === "initial";
-
-			if (isCriticalError) {
-				app.showError(data, $.extend(options, {
-					"request": app.request
-				}));
-			}
-		}
+	app.request = app._getRequestObject({
+		"onData": app._getHandlerFor("onData"),
+		"onUpdate": app._getHandlerFor("onUpdate"),
+		"onError": app._getHandlerFor("onError")
 	});
+
+	var data = app.get("data");
+	if ($.isEmptyObject(data)) {
+		app.request.send();
+        } else {
+		app._getHandlerFor("onData")(data);
+		app.request.send({
+			"skipInitialRequest": true,
+			"data": {
+				"q": app._assembleQuery(),
+				"appkey": app.config.get("dependencies.StreamServer.appkey"),
+				"since": data.nextSince
+			}
+		});
+	}
 };
 
 volume.destroy = function() {
-	var timer = this.get("timer");
-	if (timer) {
-		clearTimeout(timer);
-		this.remove("timer");
-	}
+	$.each(this.get("watchers"), function(_, watcher) {
+		watcher.stop();
+	});
 };
 
 volume.templates.main =
@@ -285,26 +275,6 @@ volume.methods._getPeriodResolutionType = function(entries) {
 	};
 };
 
-// the goal of this function is to make sure that we add
-// periods to graphs as needed even in case we do not receive
-// items via live updates
-volume.methods._setupPeriodsWatcher = function() {
-	var app = this;
-	var getLastPeriodStart = function() {
-		return app.get("periods")[app.get("periods").length - 1].start;
-	};
-	var nextPeriodStart = getLastPeriodStart() + this.get("period.interval");
-	var delta = nextPeriodStart - Math.round((new Date()).getTime() / 1000);
-	var checkTimeout = delta > 0 ? delta : this.get("period.interval");
-	var timeout = setTimeout(function() {
-		if (getLastPeriodStart() !== nextPeriodStart) {
-			app._createPeriod(nextPeriodStart, 0, "push", true);
-		}
-		app._setupPeriodsWatcher();
-	}, checkTimeout * 1000);
-	this.set("timeout", timeout);
-};
-
 volume.methods._createPeriods = function() {
 	var period = this.get("period");
 	for (var i = 0; i < period.limit; i++) {
@@ -341,11 +311,11 @@ volume.methods._assembleQuery = function() {
 	return this.substitute({"template": query});
 };
 
-volume.methods._requestData = function(handlers) {
+volume.methods._getRequestObject = function(handlers) {
 	var ssConfig = this.config.get("dependencies.StreamServer");
 	// keep a reference to a request object in "this" to trigger its
 	// automatic sweeping out on Echo.Control level at app destory time
-	this.request = Echo.StreamServer.API.request({
+	return Echo.StreamServer.API.request({
 		"endpoint": "search",
 		"apiBaseURL": ssConfig.apiBaseURL,
 		"data": {
@@ -358,7 +328,130 @@ volume.methods._requestData = function(handlers) {
 		"onError": handlers.onError,
 		"onData": handlers.onData
 	});
-	this.request.send();
+};
+
+// the goal of this function is to make sure that we add
+// periods to graphs as needed even in case we do not receive
+// items via live updates
+volume.methods._createPeriodWatcher = function() {
+	var app = this;
+	var timeout;
+	var getLastPeriodStart = function() {
+		return app.get("periods")[app.get("periods").length - 1].start;
+	};
+	var start = function() {
+		var interval = app.get("period.interval");
+		var nextPeriodStart = getLastPeriodStart() + interval;
+		var delta = nextPeriodStart - Math.round((new Date()).getTime() / 1000);
+		var checkTimeout = delta > 0 ? delta : interval;
+		timeout = setTimeout(function() {
+			if (getLastPeriodStart() !== nextPeriodStart) {
+				app._createPeriod(nextPeriodStart, 0, "push", true);
+			}
+			start();
+		}, checkTimeout * 1000);
+	};
+	return {
+		"start": start,
+		"stop": function() {
+			clearTimeout(timeout);
+		}
+	};
+};
+
+// mat be move to Echo.Utils later...
+// inspired by http://www.html5rocks.com/en/tutorials/pagevisibility/intro/
+volume.methods._createDocumentVisibilityWatcher = function() {
+	var prefix, handler;
+
+	// if "hidden" is natively supported just return it
+	if ("hidden" in document) {
+		prefix = ""; // non-prefixed, i.e. natively supported
+	} else {
+		var prefixes = ["webkit", "moz", "ms", "o"];
+		for (var i = 0; i < prefixes.length; i++){
+			if ((prefixes[i] + "Hidden") in document) {
+				prefix = prefixes[i] + "Hidden";
+				break;
+			}
+		}
+	}
+
+	// we were unable to locate "hidden" property,
+	// which means this functionality is not supported
+	if (prefix === undefined) return;
+
+	var eventName = prefix + "visibilitychange";
+	return {
+		"start": function(onShow, onHide) {
+			handler = function() {
+				document[prefix ? prefix + "Hidden" : "hidden"]
+					? onHide()
+					: onShow();
+			};
+			$(document).on(eventName, handler);
+		},
+		"stop": function() {
+			$(document).off(eventName, handler);
+		}
+	};
+};
+
+volume.methods._getHandlerFor = function(name) {
+	return $.proxy(this.handlers[name], this);
+};
+
+volume.methods.handlers = {};
+
+volume.methods.handlers.onData = function(data) {
+	// store initial data in the config as well,
+	// so that we can access it later to refresh the graph
+	if ($.isEmptyObject(this.config.get("data"))) {
+		this.config.set("data", data);
+	}
+
+	var entries = this._normalizeEntries(data.entries);
+	this.set("period", this._getPeriodResolutionType(entries));
+
+	this._createPeriods();
+
+	this.set("watchers.period", this._createPeriodWatcher());
+	this.get("watchers.period").start();
+
+	this._placeIntoPeriods(entries);
+
+	this.render();
+
+	// we init graph *only* after a target is placed into DOM,
+	// Chart.js doesn't like elements detached from DOM structure...
+	this.set("chart", this._initChart(this.view.get("graph")));
+
+	this.ready();
+};
+
+volume.methods.handlers.onUpdate = function(data) {
+	if (this.get("visible")) {
+		this._placeIntoPeriods(this._normalizeEntries(data.entries), true);
+	}
+	if (data && data.entries) {
+		// keep 2x items to fill graph with more data
+		var max = this.config.get("maxItemsToRetrieve") * 2;
+		var entries = this.config.get("data.entries", []);
+		data.entries = data.entries.concat(entries).slice(0, max);
+		this.config.set("data", data);
+	}
+};
+
+volume.methods.handlers.onError = function(data, options) {
+	var isCriticalError =
+		typeof options.critical === "undefined" ||
+		options.critical && options.requestType === "initial";
+
+	if (isCriticalError) {
+		this.showError(data, $.extend(options, {
+			"request": this.request
+		}));
+	}
 };
 
 volume.css =
