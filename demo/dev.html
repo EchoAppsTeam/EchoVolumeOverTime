@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Echo Historical Volume app v{%=packageVersions.stable%} Demo</title>
+		<script type="text/javascript" src="//cdn.echoenabled.com/sdk/v3/dev/loader.js"></script>
+	</head>
+<body>
+
+<center><h1>Bar chart (#puppies)</h1></center>
+<div id="container-bar" style="margin: 0px auto; width: 50%; max-width: 440px;"></div>
+
+<br>
+
+<center><h1>Line chart (#puppies)</h1></center>
+<div id="container-line" style="margin: 0px auto; width: 50%; max-width: 440px;"></div>
+
+<script type="text/javascript">
+	Echo.Loader.initApplication({
+		"scripts": {
+			"dev": "{%= appBaseURLs.dev %}/app.js",
+			"prod": "{%= appBaseURLs.prod %}/app.js"
+		},
+		"component": "Echo.Apps.VolumeOverTime",
+		"config": {
+			"target": document.getElementById("container-bar"),
+			"targetURL": "http://social-chatter.echoplatform.com/social-source-input/fm703jjma7",
+			"dependencies": {
+				"StreamServer": {"appkey": "echo.echo.streamserver.echo.prod"}
+			}
+		}
+	});
+
+	Echo.Loader.initApplication({
+		"scripts": {
+			"dev": "{%= appBaseURLs.dev %}/app.js",
+			"prod": "{%= appBaseURLs.prod %}/app.js"
+		},
+		"component": "Echo.Apps.VolumeOverTime",
+		"config": {
+			"target": document.getElementById("container-line"),
+			"targetURL": "http://social-chatter.echoplatform.com/social-source-input/fm703jjma7",
+			"presentation": {"visualization": "line"},
+			"dependencies": {
+				"StreamServer": {"appkey": "echo.echo.streamserver.echo.prod"}
+			}
+		}
+	});
+</script>
+
+</body>
+</html>
