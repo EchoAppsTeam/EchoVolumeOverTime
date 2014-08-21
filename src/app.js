@@ -94,7 +94,7 @@ volume.init = function() {
 	var data = app.get("data");
 	if ($.isEmptyObject(data)) {
 		app.request.send();
-        } else {
+	} else {
 		app._getHandlerFor("onData")(data);
 		app.request.send({
 			"skipInitialRequest": true,
@@ -353,7 +353,7 @@ volume.methods._createPeriodWatcher = function() {
 	};
 };
 
-// mat be move to Echo.Utils later...
+// maybe move to Echo.Utils later...
 // inspired by http://www.html5rocks.com/en/tutorials/pagevisibility/intro/
 volume.methods._createDocumentVisibilityWatcher = function() {
 	var prefix, handler;
@@ -363,7 +363,7 @@ volume.methods._createDocumentVisibilityWatcher = function() {
 		prefix = ""; // non-prefixed, i.e. natively supported
 	} else {
 		var prefixes = ["webkit", "moz", "ms", "o"];
-		for (var i = 0; i < prefixes.length; i++){
+		for (var i = 0; i < prefixes.length; i++) {
 			if ((prefixes[i] + "Hidden") in document) {
 				prefix = prefixes[i] + "Hidden";
 				break;
@@ -428,7 +428,11 @@ volume.methods.handlers.onUpdate = function(data) {
 		this._placeIntoPeriods(this._normalizeEntries(data.entries), true);
 	}
 	if (data && data.entries) {
-		// keep 2x items to fill graph with more data
+		// we keep 2x items to increase the chances of avoiding gaps
+		// on the graph. StreamServer keeps 2x items in a cached view,
+		// so we may later implement additional data fetching which will
+		// result in 2x data increase on the client side, so 2x number is
+		// future-proof
 		var max = this.config.get("maxItemsToRetrieve") * 2;
 		var entries = this.config.get("data.entries", []);
 		data.entries = data.entries.concat(entries).slice(0, max);
