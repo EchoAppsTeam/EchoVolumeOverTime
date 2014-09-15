@@ -23,6 +23,10 @@ dashboard.dependencies = [{
 }, {
 	"url": "{config:cdnBaseURL.apps.dataserver}/full.pack.js",
 	"control": "Echo.DataServer.Controls.Pack"
+}, {
+	"url": "//cdn.echoenabled.com/apps/echo/social-map/v1/slider.js"
+}, {
+	"url": "//cdn.echoenabled.com/apps/echo/social-map/v1/colorpicker.js"
 }];
 
 dashboard.config = {
@@ -67,16 +71,60 @@ dashboard.config.ecl = [{
 			}]
 		}
 	}, {
-		"component": "Input",
+		"component": "Slider",
 		"name": "maxIntervals",
 		"type": "number",
 		"default": 10,
 		"config": {
 			"title": "Maximum slices",
-			"desc": "Specifies a maximum number of time slices for the chart"
+			"desc": "Specifies a maximum number of time slices for the chart",
+			"min": 3,
+			"max": 15,
+			"step": 1,
+			"unit": "pcs"
 		}
 	}, {
-	"component": "Input",
+		"component": "Colorpicker",
+		"name": "fillColor",
+		"type": "string",
+		"default": "#D8D8D8",
+		"config": {
+			"title": "Fill color",
+			"desc": "Specifies the primary fill color of the chart",
+			"data": {"sample": "#D8D8D8"}
+		}
+	}, {
+		"component": "Colorpicker",
+		"name": "strokeColor",
+		"type": "string",
+		"default": "#C0C0C0",
+		"config": {
+			"title": "Stroke color",
+			"desc": "Specifies border color/line color of the chart",
+			"data": {"sample": "#C0C0C0"}
+		}
+	}, {
+		"component": "Colorpicker",
+		"name": "highlightFill",
+		"type": "string",
+		"default": "#C0C0C0",
+		"config": {
+			"title": "Hover fill color",
+			"desc": "Specifies primary fill color of the chart when mouse is hovering over it (for Bar Chart only)",
+			"data": {"sample": "#C0C0C0"}
+		}
+	}, {
+		"component": "Colorpicker",
+		"name": "highlightStroke",
+		"type": "string",
+		"default": "#C0C0C0",
+		"config": {
+			"title": "Hover stroke color",
+			"desc": "Specifies stroke color of the chart when mouse is hovering over it (for Bar Chart only)",
+			"data": {"sample": "#C0C0C0"}
+		}
+	}, {
+		"component": "Input",
 		"name": "maxWidth",
 		"type": "number",
 		"default": 700,
@@ -85,49 +133,14 @@ dashboard.config.ecl = [{
 			"desc": "Specifies a maximum width (in pixels) of an App container",
 			"data": {"sample": 700}
 		}
-	}, {
-		"component": "Input",
-		"name": "fillColor",
-		"type": "string",
-		"config": {
-			"title": "Fill color",
-			"desc": "Specifies the primary fill color of the chart",
-			"data": {"sample": "#D8D8D8"}
-		}
-	}, {
-		"component": "Input",
-		"name": "strokeColor",
-		"type": "string",
-		"config": {
-			"title": "Stroke color",
-			"desc": "Specifies border color/line color of the chart",
-			"data": {"sample": "#C0C0C0"}
-		}
-	}, {
-		"component": "Input",
-		"name": "highlightFill",
-		"type": "string",
-		"config": {
-			"title": "Hover fill color",
-			"desc": "Specifies primary fill color of the chart when mouse is hovering over it (for Bar Chart only)",
-			"data": {"sample": "#C0C0C0"}
-		}
-	}, {
-		"component": "Input",
-		"name": "highlightStroke",
-		"type": "string",
-		"config": {
-			"title": "Hover stroke color",
-			"desc": "Specifies stroke color of the chart when mouse is hovering over it (for Bar Chart only)",
-			"data": {"sample": "#C0C0C0"}
-		}
 	}]
 }, {
 	"component": "Group",
 	"name": "dependencies",
 	"type": "object",
 	"config": {
-		"title": "Dependencies"
+		"title": "Dependencies",
+		"expanded": false
 	},
 	"items": [{
 		"component": "Select",
