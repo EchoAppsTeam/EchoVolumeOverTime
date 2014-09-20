@@ -22,6 +22,7 @@ volume.config = {
 	// amount of items to retrieve from StreamServer
 	// 100 is the limitation on the amount of root items
 	"maxItemsToRetrieve": 100,
+	"chartUpdateDelay": 5000, // in ms
 	"presentation": {
 		"visualization": "bar", // or "line"
 		"maxIntervals": 10,
@@ -88,6 +89,10 @@ volume.init = function() {
 		});
 		app.set("watchers.visibility", watcher);
 	}
+
+	// create chart update watcher to prevent
+	// massive amount of chart update calls
+	app.set("watchers.update", app._createUpdateWatcher());
 
 	app.request = app._getRequestObject();
 
@@ -172,7 +177,7 @@ volume.methods._placeIntoPeriods = function(entries, updateChart) {
 					var type = visualization === "line" ? "points" : "bars";
 					if (chart.datasets[0][type][id]) {
 						chart.datasets[0][type][id].value = period.count;
-						chart.update();
+						app.get("watchers.update").start();
 					}
 				}
 				placed = true;
@@ -351,6 +356,26 @@ volume.methods._createPeriodWatcher = function() {
 			clearTimeout(timeout);
 		}
 	};
+};
+
+// we prevent chart updates from super-fast calls in case of a huge
+// new items flow, since chart update is quite CPU-intensive operation.
+volume.methods._createUpdateWatcher = function() {
+	var app = this, timeout;
+	var stop = function() {
+		clearTimeout(timeout);
+		timeout = undefined;
+	};
+	var start = function() {
+		if (timeout || !app.get("chart")) return;
+		timeout = setTimeout(function() {
+			if (app.get("visible")) {
+				app.get("chart").update();
+			}
+			stop();
+		}, app.config.get("chartUpdateDelay"));
+	};
+	return {"start": start, "stop": stop};
 };
 
 // maybe move to Echo.Utils later...
