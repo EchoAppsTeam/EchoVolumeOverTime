@@ -25,6 +25,7 @@ volume.config = {
 	"chartUpdateDelay": 5000, // in ms
 	"presentation": {
 		"visualization": "bar", // or "line"
+		"minIntervals": 3,
 		"maxIntervals": 10,
 		"maxWidth": 700, // in px
 		"fillColor": "#D8D8D8",
@@ -192,6 +193,25 @@ volume.methods._placeIntoPeriods = function(entries, updateChart) {
 	});
 };
 
+volume.methods._cleanupPeriods = function() {
+	var limit = this.config.get("presentation.minIntervals");
+	var periods = this.get("periods", []);
+	var nonEmptyIntervalSeen = false;
+	var filter = function(period, id) {
+
+		// display everything after first non-empty interval
+		if (nonEmptyIntervalSeen) return true;
+
+		nonEmptyIntervalSeen = period.count > 0;
+
+		// we get rid of empty intervals, but keep a number of
+		// intervals (defined within "presentation.minIntervals")
+		// even if they are empty, so that we can render a graph
+		return nonEmptyIntervalSeen || ((periods.length - 1) - id < limit);
+	};
+	this.set("periods", $.grep(periods, filter));
+};
+
 volume.methods._getTimestampTranslation = function(timestamp) {
 	var app = this;
 	var date = new Date(timestamp * 1000);
@@ -224,7 +244,6 @@ volume.methods._getTS = function(y, m, d, h, min) {
 };
 
 volume.methods._getPeriodResolutionType = function(entries) {
-	var maxIntervals = this.config.get("presentation.maxIntervals");
 	var date = new Date(),
 		year = date.getFullYear(),
 		month = date.getMonth(),
@@ -239,7 +258,6 @@ volume.methods._getPeriodResolutionType = function(entries) {
 	if (avg < 60 * 60) {
 		return {
 			"type": "min",
-			"limit": maxIntervals,
 			"interval": 60,
 			"start": this._getTS(year, month, day, hours, mins)
 		};
@@ -247,7 +265,6 @@ volume.methods._getPeriodResolutionType = function(entries) {
 	if (avg < 60 * 60 * 24) {
 		return {
 			"type": "hour",
-			"limit": maxIntervals,
 			"interval": 60 * 60,
 			"start": this._getTS(year, month, day, hours)
 		};
@@ -255,7 +272,6 @@ volume.methods._getPeriodResolutionType = function(entries) {
 	if (avg < 60 * 60 * 24 * 7) {
 		return {
 			"type": "day",
-			"limit": maxIntervals,
 			"interval": 60 * 60 * 24,
 			"start": this._getTS(year, month, day)
 		};
@@ -263,22 +279,21 @@ volume.methods._getPeriodResolutionType = function(entries) {
 	if (avg < 60 * 60 * 24 * 365) {
 		return {
 			"type": "month",
-			"limit": maxIntervals,
 			"interval": 60 * 60 * 24 * 30,
 			"start": this._getTS(year, month)
 		};
 	}
 	return {
 		"type": "year",
-		"limit": 3, // show 3 last years, no need to display more
 		"interval": 60 * 60 * 24 * 365,
 		"start": this._getTS(year)
 	};
 };
 
 volume.methods._createPeriods = function() {
+	var limit = this.config.get("presentation.maxIntervals");
 	var period = this.get("period");
-	for (var i = 0; i < period.limit; i++) {
+	for (var i = 0; i < limit; i++) {
 		this._createPeriod(period.start - i * period.interval, 0);
 	}
 };
@@ -438,6 +453,10 @@ volume.methods.handlers.onData = function(data) {
 	this.get("watchers.period").start();
 
 	this._placeIntoPeriods(entries);
+
+	// get rid of empty periods
+	// at the very beginning of the graph
+	this._cleanupPeriods();
 
 	this.render();
 
