@@ -65,6 +65,10 @@ volume.dependencies = [{
 	"loaded": function() { return !!window.Chart; }
 }];
 
+volume.labels = {
+	"noData": "No data yet.<br>Stay tuned!"
+};
+
 volume.init = function() {
 	var app = this;
 
@@ -124,9 +128,23 @@ volume.templates.main =
 		'<canvas class="{class:graph}"></canvas>' +
 	'</div>';
 
+volume.templates.empty =
+	'<div class="{class:empty}">' +
+		'<span class="{class:message}">{label:noData}</span>' +
+	'</div>';
+
 volume.renderers.container = function(element) {
 	element.css({"max-width": parseInt(this.config.get("presentation.maxWidth") + "px")});
 	return element;
+};
+
+volume.methods.template = function() {
+	return this.templates[this._hasData() ? "main" : "empty"];
+};
+
+volume.methods._hasData = function() {
+	var entries = this.config.get("data.entries", []);
+	return !!entries.length;
 };
 
 volume.methods._initChart = function(target) {
@@ -462,7 +480,9 @@ volume.methods.handlers.onData = function(data) {
 
 	// we init graph *only* after a target is placed into DOM,
 	// Chart.js doesn't like elements detached from DOM structure...
-	this.set("chart", this._initChart(this.view.get("graph")));
+	if (this._hasData()) {
+		this.set("chart", this._initChart(this.view.get("graph")));
+	}
 
 	this.ready();
 };
@@ -498,7 +518,9 @@ volume.methods.handlers.onError = function(data, options) {
 
 volume.css =
 	'.{class:container} { margin: 0px auto; }' +
-	'.{class:graph} { width: 100%; }';
+	'.{class:graph} { width: 100%; }' +
+	'.{class:empty} { border: 1px solid #d2d2d2; background-color: #fff; margin: 0 5px 10px 5px; padding: 30px 20px; text-align: center; }' +
+	'.{class:empty} .{class:message} { background: url("//cdn.echoenabled.com/apps/echo/conversations/v2/sdk-derived/images/info.png") no-repeat; margin: 0 auto; font-size: 14px; font-family: "Helvetica Neue", Helvetica, "Open Sans", sans-serif; padding-left: 40px; display: inline-block; text-align: left; line-height: 16px; color: #7f7f7f; }';
 
 Echo.App.create(volume);
 
