@@ -17,6 +17,10 @@ volume.vars = {
 	]
 };
 
+volume.labels = {
+	"noData": "No data yet.<br>Stay tuned!"
+};
+
 volume.config = {
 	"targetURL": undefined,
 	// amount of items to retrieve from StreamServer
@@ -123,6 +127,10 @@ volume.destroy = function() {
 	});
 };
 
+volume.methods.template = function() {
+	return this.templates[this._hasData() ? "main" : "empty"];
+};
+
 volume.templates.main =
 	'<div class="{class:container}">' +
 		'<canvas class="{class:graph}"></canvas>' +
@@ -132,6 +140,10 @@ volume.templates.empty =
 	'<div class="{class:empty}">' +
 		'<span class="{class:message}">{label:noData}</span>' +
 	'</div>';
+
+volume.methods._hasData = function() {
+	return !!this.config.get("data.entries", []).length;
+};
 
 volume.renderers.container = function(element) {
 	element.css({"max-width": parseInt(this.config.get("presentation.maxWidth") + "px")});
@@ -470,7 +482,9 @@ volume.methods.handlers.onData = function(data) {
 	this.set("watchers.period", this._createPeriodWatcher());
 	this.get("watchers.period").start();
 
-	this._placeIntoPeriods(entries);
+	if (this._hasData()) {
+		this._placeIntoPeriods(entries);
+	}
 
 	// get rid of empty periods
 	// at the very beginning of the graph
@@ -488,10 +502,9 @@ volume.methods.handlers.onData = function(data) {
 };
 
 volume.methods.handlers.onUpdate = function(data) {
-	if (this.get("visible")) {
-		this._placeIntoPeriods(this._normalizeEntries(data.entries), true);
-	}
+	var origEntries, hasData = this._hasData();
 	if (data && data.entries) {
+		origEntries = data.entries;
 		// we keep 2x items to increase the chances of avoiding gaps
 		// on the graph. StreamServer keeps 2x items in a cached view,
 		// so we may later implement additional data fetching which will
@@ -501,6 +514,13 @@ volume.methods.handlers.onUpdate = function(data) {
 		var entries = this.config.get("data.entries", []);
 		data.entries = data.entries.concat(entries).slice(0, max);
 		this.config.set("data", data);
+	}
+	if (this.get("visible")) {
+		if (!hasData && origEntries && origEntries.length) {
+			this.render();
+			this.set("chart", this._initChart(this.view.get("graph")));
+		}
+		this._placeIntoPeriods(this._normalizeEntries(origEntries), true);
 	}
 };
 
