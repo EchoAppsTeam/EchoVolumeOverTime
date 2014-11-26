@@ -32,6 +32,7 @@ volume.config = {
 		"minIntervals": 3,
 		"maxIntervals": 10,
 		"maxWidth": 700, // in px
+		"aspectRatio": 1.8, // width/height proportion
 		"fillColor": "#D8D8D8",
 		"strokeColor": "#C0C0C0",
 		"highlightFill": "#C0C0C0",
@@ -133,7 +134,9 @@ volume.methods.template = function() {
 
 volume.templates.main =
 	'<div class="{class:container}">' +
-		'<canvas class="{class:graph}"></canvas>' +
+		'<div class="{class:subcontainer}">' +
+			'<canvas class="{class:graph}"></canvas>' +
+		'</div>' +
 	'</div>';
 
 volume.templates.empty =
@@ -180,6 +183,14 @@ volume.methods._initChart = function(target) {
 		}]
 	};
 	var ctx = target.get(0).getContext("2d");
+
+	// define proper aspect ratio
+	var width = parseInt(target.width());
+	if (ctx.canvas && width && presentation.aspectRatio) {
+		ctx.canvas.width = width;
+		ctx.canvas.height = width / presentation.aspectRatio;
+	}
+
 	var type = presentation.visualization === "bar" ? "Bar" : "Line";
 	return new Chart(ctx)[type](data, this.config.get("chart"));
 };
@@ -538,6 +549,7 @@ volume.methods.handlers.onError = function(data, options) {
 
 volume.css =
 	'.{class:container} { margin: 0px auto; }' +
+	'.{class:subcontainer} { margin: 10px 15px 5px 0px; }' +
 	'.{class:graph} { width: 100%; }' +
 	'.{class:empty} { border: 1px solid #d2d2d2; background-color: #fff; margin: 0px; margin-bottom: 10px; padding: 30px 20px; text-align: center; }' +
 	'.{class:empty} .{class:message} { background: url("//cdn.echoenabled.com/apps/echo/conversations/v2/sdk-derived/images/info.png") no-repeat; margin: 0 auto; font-size: 14px; font-family: "Helvetica Neue", Helvetica, "Open Sans", sans-serif; padding-left: 40px; display: inline-block; text-align: left; line-height: 16px; color: #7f7f7f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; box-sizing: border-box; }';
