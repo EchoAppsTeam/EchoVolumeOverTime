@@ -290,34 +290,41 @@ volume.methods._getPeriodResolutionType = function(entries) {
 		month = date.getMonth(),
 		day = date.getDate(),
 		hours = date.getHours(),
-		mins = date.getMinutes();
+		mins = date.getMinutes(),
+		nowTS = this._getTS(),
+		maxIntervals = this.config.get("presentation.maxIntervals");
+
+	var _containsData = function(interval) {
+		return !entries.length ||
+			entries[0].timestamp > (nowTS - maxIntervals * interval);
+	};
 
 	var avg = entries.length
-		? (this._getTS() - entries[entries.length - 1].timestamp) / 2
+		? (nowTS - entries[entries.length - 1].timestamp) / 2
 		: 0;
 
-	if (avg < 60 * 60) {
+	if (avg < 60 * 60 && _containsData(60)) {
 		return {
 			"type": "min",
 			"interval": 60,
 			"start": this._getTS(year, month, day, hours, mins)
 		};
 	}
-	if (avg < 60 * 60 * 24) {
+	if (avg < 60 * 60 * 24 && _containsData(60 * 60)) {
 		return {
 			"type": "hour",
 			"interval": 60 * 60,
 			"start": this._getTS(year, month, day, hours)
 		};
 	}
-	if (avg < 60 * 60 * 24 * 7) {
+	if (avg < 60 * 60 * 24 * 7 && _containsData(60 * 60 * 24)) {
 		return {
 			"type": "day",
 			"interval": 60 * 60 * 24,
 			"start": this._getTS(year, month, day)
 		};
 	}
-	if (avg < 60 * 60 * 24 * 365) {
+	if (avg < 60 * 60 * 24 * 365 && _containsData(60 * 60 * 24 * 30)) {
 		return {
 			"type": "month",
 			"interval": 60 * 60 * 24 * 30,
