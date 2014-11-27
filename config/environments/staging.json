@@ -1,19 +1,19 @@
 {
 	"version": 2,
 	"manifest": {
-		"id": "echo-volume-over-time-staging",
-		"name": "Historical Volume (Staging)"
+		"id": "echo-volume-over-time",
+		"name": "Historical Volume"
 	},
 	"appBaseURLs": {
-		"dev": "//echoplatform.com/sandbox/staging<%= release.options.versionPath() %>/dev",
-		"prod": "//echoplatform.com/sandbox/staging<%= release.options.versionPath() %>"
+		"dev": "//cdn.echoplatform.com<%= release.options.versionPath() %>/dev",
+		"prod": "//cdn.echoplatform.com<%= release.options.versionPath() %>"
 	},
 	"apiBaseURLs": {
 		"StreamServer": {
-			"basic": "//api.dss.ul.js-kit.com/v1",
-			"ws": "//live.dss.ul.js-kit.com/v1"
+			"basic": "//api.ss.ul.js-kit.com/v1",
+			"ws": "//live.ss.ul.js-kit.com/v1"
 		},
 		"DataServer": "http://ds0.ul.js-kit.com/api",
-		"AppServer": "http://api.staging.appserver.aboutecho.com"
+		"AppServer": "http://api.staging.echostudio.co"
 	}
 }
