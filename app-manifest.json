@@ -1,6 +1,6 @@
 {
-	"id": "{%=manifest.id%}",
-	"name": "{%=manifest.name%}",
+	"id": "echo-volume-over-time",
+	"name": "Historical Volume",
 	"description": "Graphs the volume of content over time",
 	"app_version": "{%=packageVersions.stable%}",
 	"icon": "{%=appBaseURLs.prod%}/images/icon.png",

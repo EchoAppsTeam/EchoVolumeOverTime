@@ -1,9 +1,5 @@
 {
-	"version": 2,
-	"manifest": {
-		"id": "echo-volume-over-time",
-		"name": "Historical Volume"
-	},
+	"version": 3,
 	"appBaseURLs": {
 		"dev": "//cdn.echoplatform.com<%= release.options.versionPath() %>/dev",
 		"prod": "//cdn.echoplatform.com<%= release.options.versionPath() %>"
