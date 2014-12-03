@@ -402,7 +402,13 @@ volume.methods._createPeriodWatcher = function() {
 		return app.get("periods")[app.get("periods").length - 1].start;
 	};
 	var start = function() {
-		var interval = app.get("period.interval");
+		var period = app.get("period", {});
+
+		// enable period watcher for mins and hours only
+		// for other period types it doesn't make sense
+		if (period.type !== "min" && period.type !== "hour") return;
+
+		var interval = period.interval;
 		var nextPeriodStart = getLastPeriodStart() + interval;
 		var delta = nextPeriodStart - Math.round((new Date()).getTime() / 1000);
 		var checkTimeout = delta > 0 ? delta : interval;
