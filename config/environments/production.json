@@ -1,9 +1,5 @@
 {
-	"version": 2,
-	"manifest": {
-		"id": "echo-volume-over-time",
-		"name": "Historical Volume"
-	},
+	"version": 3,
 	"appBaseURLs": {
 		"dev": "//cdn.echoenabled.com<%= release.options.versionPath() %>/dev",
 		"prod": "//cdn.echoenabled.com<%= release.options.versionPath() %>"
@@ -14,6 +10,6 @@
 			"ws": "//live.echoenabled.com/v1"
 		},
 		"DataServer": "https://api.dataserver.echoenabled.com/v1",
-		"AppServer": "http://api.appserver.aboutecho.com"
+		"AppServer": "http://api.echostudio.co"
 	}
 }
