@@ -1,6 +1,6 @@
 {
 	"id": "echo-volume-over-time",
-	"name": "Historical Volume",
+	"name": "Volume",
 	"description": "Graphs the volume of content over time",
 	"app_version": "{%=packageVersions.stable%}",
 	"icon": "{%=appBaseURLs.prod%}/images/icon.png",
